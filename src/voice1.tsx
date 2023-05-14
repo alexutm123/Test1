@@ -1,22 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 
 function App11() {
-  useEffect(() => {
-    const enableMicrophone = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log('Microphone access granted:', stream);
-      } catch (error) {
-        console.error('Microphone access denied:', error);
-      }
-    };
+  const [stream, setStream] = useState(null);
 
-    enableMicrophone();
-  }, []);
+  const handleStartRecording = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setStream(mediaStream);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleStopRecording = () => {
+    stream.getTracks().forEach((track) => track.stop());
+    setStream(null);
+  };
 
   return (
     <div>
-      <h1>Hello, world!</h1>
+      {!stream ? (
+        <button onClick={handleStartRecording}>Разрешить доступ к микрофону</button>
+      ) : (
+        <button onClick={handleStopRecording}>Остановить запись</button>
+      )}
     </div>
   );
 }
