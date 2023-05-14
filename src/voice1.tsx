@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from "react";
 
-function App11() {
-  const [stream, setStream] = useState(null);
+const App11 = () => {
+  const [recording, setRecording] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const handleStartRecording = async () => {
+  const startRecording = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setStream(mediaStream);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setStream(stream);
+      if (audioRef.current) {
+        audioRef.current.srcObject = stream;
+        audioRef.current.play();
+      }
+      setRecording(true);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  const handleStopRecording = () => {
-    stream.getTracks().forEach((track) => track.stop());
-    setStream(null);
+  const stopRecording = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+      setRecording(false);
+    }
   };
 
   return (
     <div>
-      {!stream ? (
-        <button onClick={handleStartRecording}>Разрешить доступ к микрофону</button>
-      ) : (
-        <button onClick={handleStopRecording}>Остановить запись</button>
-      )}
+      <button onClick={startRecording}>Start recording</button>
+      <button onClick={stopRecording} disabled={!recording}>
+        Stop recording
+      </button>
+      <audio ref={audioRef} controls />
     </div>
   );
-}
+};
 
 export default App11;
