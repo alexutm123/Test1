@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 
 function App11() {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  useEffect(() => {
+    const enableMicrophone = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('Microphone access granted:', stream);
+      } catch (error) {
+        console.error('Microphone access denied:', error);
+      }
+    };
 
-  const handleMicAccess = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setStream(prevState => mediaStream);
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-    }
-  };
+    enableMicrophone();
+  }, []);
 
   return (
     <div>
-      <button onClick={handleMicAccess}>Allow Microphone Access</button>
-      {stream ? 'Microphone is accessible' : 'Please allow microphone permission for this app to work properly.'}
+      <h1>Hello, world!</h1>
     </div>
   );
 }
